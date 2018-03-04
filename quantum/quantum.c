@@ -236,7 +236,7 @@ bool process_record_quantum(keyrecord_t *record) {
   #ifdef STENO_ENABLE
     process_steno(keycode, record) &&
   #endif
-  #if ( defined(AUDIO_ENABLE) || (defined(MIDI_ENABLE) && defined(MIDI_BASIC))) && !defined(NO_MUSIC_MODE) 
+  #if ( defined(AUDIO_ENABLE) || (defined(MIDI_ENABLE) && defined(MIDI_BASIC))) && !defined(NO_MUSIC_MODE)
     process_music(keycode, record) &&
   #endif
   #ifdef TAP_DANCE_ENABLE
@@ -842,12 +842,12 @@ void matrix_scan_quantum() {
     matrix_scan_tap_dance();
   #endif
 
-  #ifdef COMBO_ENABLE
-    matrix_scan_combo();
-  #endif
-
   #if defined(BACKLIGHT_ENABLE) && defined(BACKLIGHT_PIN)
     backlight_task();
+  #endif
+
+  #ifdef COMBO_ENABLE
+    matrix_scan_combo();
   #endif
 
   matrix_scan_kb();
