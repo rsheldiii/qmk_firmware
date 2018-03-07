@@ -24,7 +24,7 @@
 typedef struct
 {
     const uint16_t *keys;
-    uint16_t keycode;        
+    uint16_t keycode;
 #ifdef EXTRA_EXTRA_LONG_COMBOS
     uint32_t state;
 #elif EXTRA_LONG_COMBOS
@@ -32,14 +32,7 @@ typedef struct
 #else
     uint8_t state;
 #endif
-    uint16_t timer;
-#ifdef COMBO_ALLOW_ACTION_KEYS
-    keyrecord_t prev_record;
-#else
-    uint16_t prev_key;
-#endif
 } combo_t;
-
 
 #define COMBO(ck, ca)       {.keys = &(ck)[0], .keycode = (ca)}
 #define COMBO_ACTION(ck)    {.keys = &(ck)[0]}
