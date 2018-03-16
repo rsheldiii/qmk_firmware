@@ -33,11 +33,9 @@ static inline void send_combo(uint8_t combo_index, bool pressed) {
     uint16_t action = combo->keycode;
 
     if (action) {
-        if (pressed) {
-            register_code16(action);
-        } else {
-            unregister_code16(action);
-        }
+        keyevent_t event = {{0,0}, pressed, timer_read()};
+        keyrecord_t record = {event};
+        process_action(&record, action_for_keycode(action));
     } else {
         process_combo_event(combo_index, pressed);
     }
@@ -69,6 +67,10 @@ static bool process_single_combo(uint8_t combo_index, uint16_t keycode, keyrecor
         if (keycode == key) index = count;
         if (COMBO_END == key) break;
     }
+
+    // for (uint8_t i = 0; i < buffer_size; i++) {
+    //   record_t record = keypress_buffer()
+    // }
 
     /* Continue processing if not a combo key */
     if (-1 == (int8_t)index) {
