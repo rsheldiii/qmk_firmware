@@ -26,10 +26,14 @@ static uint8_t keypress_buffer[MAX_COMBO_LENGTH];
 #endif
 
 __attribute__ ((weak))
-combo_t key_combos[] = {};
+combo_t key_combos[] = {
+
+};
 
 __attribute__ ((weak))
-void process_combo_event(uint8_t combo_index, bool pressed) {}
+void process_combo_event(uint8_t combo_index, bool pressed) {
+
+}
 
 static uint8_t buffer_size = 0;
 static uint16_t timer = 0;
