@@ -45,6 +45,15 @@ typedef struct
 #define COMBO_TERM TAPPING_TERM
 #endif
 
+# ifdef EXTRA_EXTRA_LONG_COMBOS
+#define MAX_COMBO_LENGTH 32
+# elif EXTRA_LONG_COMBOS
+#define MAX_COMBO_LENGTH 16
+# else
+#define MAX_COMBO_LENGTH 8
+# endif
+
+
 bool process_combo(uint16_t keycode, keyrecord_t *record);
 void matrix_scan_combo(void);
 void process_combo_event(uint8_t combo_index, bool pressed);

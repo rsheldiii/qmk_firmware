@@ -17,14 +17,20 @@
 #include "process_combo.h"
 #include "print.h"
 
+static bool clear_current_buffer = false;
+
+#ifdef COMBO_ALLOW_ACTION_KEYS
+static keyrecord_t keypress_buffer[MAX_COMBO_LENGTH];
+#else
+static uint8_t keypress_buffer[MAX_COMBO_LENGTH];
+#endif
+
 __attribute__ ((weak))
 combo_t key_combos[] = {};
 
 __attribute__ ((weak))
 void process_combo_event(uint8_t combo_index, bool pressed) {}
 
-static bool clear_current_buffer = false;
-static keyrecord_t keypress_buffer[8];
 static uint8_t buffer_size = 0;
 static uint16_t timer = 0;
 
@@ -43,11 +49,16 @@ static inline void send_combo(uint8_t combo_index, bool pressed) {
     }
 }
 
-static inline void dump_keypress_buffer(bool print) {
-    if (print) {
+static inline void dump_keypress_buffer(bool emit) {
+    if (emit) {
         for (uint8_t i = 0; i < buffer_size; i++) {
+#ifdef COMBO_ALLOW_ACTION_KEYS
             const action_t action = store_or_get_action(keypress_buffer[i].event.pressed, keypress_buffer[i].event.key);
             process_action(&(keypress_buffer[i]), action);
+#else
+            register_code16(keypress_buffer[i]);
+            send_keyboard_report();
+#endif
         }
     }
 
@@ -59,7 +70,7 @@ static inline void dump_keypress_buffer(bool print) {
 #define KEY_STATE_UP(key)           do{ combo->state &= ~(1<<key); } while(0)
 
 static bool process_single_combo(uint8_t combo_index, uint16_t keycode, keyrecord_t *record) {
-    combo_t *combo = &(key_combos[combo_index]);
+    combo_t *combo = &key_combos[combo_index];
     uint8_t count = 0;
     uint8_t index = -1;
 
@@ -91,7 +102,6 @@ static bool process_single_combo(uint8_t combo_index, uint16_t keycode, keyrecor
         if (ALL_COMBO_KEYS_ARE_DOWN) {
             /* Combo released, unsend and don't process */
             send_combo(combo_index, false);
-            /* don't continue processing */
             continue_processing = false;
         }
 
@@ -116,10 +126,16 @@ bool process_combo(uint16_t keycode, keyrecord_t *record) {
         /* If no combo consumes the record, we spit out our buffer */
         dump_keypress_buffer(true);
     } else if (record->event.pressed) {
-      /* Record all keypresses that don't drop the buffer */
+        /* Record all keypresses that don't drop the buffer */
         timer = timer_read();
-        keypress_buffer[buffer_size] = *record;
-        buffer_size++;
+        if(buffer_size < MAX_COMBO_LENGTH) {
+#ifdef COMBO_ALLOW_ACTION_KEYS
+          keypress_buffer[buffer_size] = *record;
+#else
+          keypress_buffer[buffer_size] = keycode;
+#endif
+          buffer_size++;
+        }
     }
 
     return continue_processing_record;
