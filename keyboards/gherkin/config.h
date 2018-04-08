@@ -12,12 +12,12 @@
 #define DESCRIPTION     A 30 key ortholinear keyboard
 
 /* key matrix size */
-#define MATRIX_ROWS 5
-#define MATRIX_COLS 6
+#define MATRIX_ROWS 6
+#define MATRIX_COLS 7
 
 /* key matrix pins */
-#define MATRIX_ROW_PINS { F7, B1, B3, B2, B6 }
-#define MATRIX_COL_PINS { B4, E6, D7, C6, D4, D0 }
+#define MATRIX_ROW_PINS { F7, B1, B3, B2, B6, F5 }
+#define MATRIX_COL_PINS { B4, E6, D7, C6, D4, D0, F6 }
 #define UNUSED_PINS
 
 /* COL2ROW or ROW2COL */

@@ -236,8 +236,11 @@ bool process_record_quantum(keyrecord_t *record) {
   #ifdef STENO_ENABLE
     process_steno(keycode, record) &&
   #endif
-  #if ( defined(AUDIO_ENABLE) || (defined(MIDI_ENABLE) && defined(MIDI_BASIC))) && !defined(NO_MUSIC_MODE) 
+  #if ( defined(AUDIO_ENABLE) || (defined(MIDI_ENABLE) && defined(MIDI_BASIC))) && !defined(NO_MUSIC_MODE)
     process_music(keycode, record) &&
+  #endif
+  #ifdef COMBO_ENABLE
+  process_combo(keycode, record) &&
   #endif
   #ifdef TAP_DANCE_ENABLE
     process_tap_dance(keycode, record) &&
@@ -247,9 +250,6 @@ bool process_record_quantum(keyrecord_t *record) {
   #endif
   #ifndef DISABLE_CHORDING
     process_chording(keycode, record) &&
-  #endif
-  #ifdef COMBO_ENABLE
-    process_combo(keycode, record) &&
   #endif
   #ifdef UNICODE_ENABLE
     process_unicode(keycode, record) &&
