@@ -1,7 +1,7 @@
 // Bob-specific
 
 #define COMBO_COUNT 4
-#define COMBO_TERM 20
+#define COMBO_TERM 2000
 
 #ifndef CONFIG_H
 #define CONFIG_H
