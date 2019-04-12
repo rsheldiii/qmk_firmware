@@ -1,13 +1,26 @@
 #include QMK_KEYBOARD_H
 
+
 #define FN1_Q LT(1, KC_Q)
+
+enum combos {
+  MY_COMBO_AND,
+  MY_COMBO_BSPC,
+};
+const uint16_t PROGMEM combo_and[] = {KC_A, KC_N, COMBO_END};
+const uint16_t PROGMEM combo_bspc[] = {KC_O, KC_P, COMBO_END};
+
+combo_t key_combos[COMBO_COUNT] = {
+  [MY_COMBO_AND] = COMBO_ACTION(combo_and),
+  [MY_COMBO_BSPC] = COMBO(combo_bspc, KC_BSPC),
+};
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   [0] = LAYOUT_ortho_3x10(
     FN1_Q,   KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,
-    KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_ESC,
-    KC_Z,    KC_X,    KC_C,    KC_V,    KC_BSPC, KC_SPC,  KC_B,    KC_N,    KC_M,    KC_ENT
+    KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_ENT,
+    KC_Z,    KC_X,    KC_C,    KC_V,    KC_B, KC_N,  KC_B,    KC_N,    KC_M,    KC_ESC
   ),
 
   [1] = LAYOUT_ortho_3x10(
@@ -17,6 +30,25 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   ),
 
 };
+
+void keyboard_post_init_user(void) {
+  // Customise these values to desired behaviour
+  debug_enable=true;
+  // debug_matrix=true;
+  // debug_keyboard=true;
+  //debug_mouse=true;
+}
+
+void process_combo_event(uint8_t combo_index, bool pressed) {
+  switch(combo_index) {
+    case MY_COMBO_AND:
+      if (pressed) {
+        SEND_STRING("and ");
+      }
+      break;
+    // ...
+  }
+}
 
 void matrix_init_user(void) {
 }
