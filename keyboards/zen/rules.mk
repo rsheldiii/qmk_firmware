@@ -4,7 +4,7 @@ MCU = atmega32u4
 F_CPU = 16000000
 ARCH = AVR8
 F_USB = $(F_CPU)
-BOOTLOADER = caterina
+BOOTLOADER = dfu
 OPT_DEFS += -DINTERRUPT_CONTROL_ENDPOINT
 
 ifeq ($(strip $(CTPC)), yes)
