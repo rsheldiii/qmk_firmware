@@ -53,7 +53,7 @@
   #ifdef RGBLIGHT_EFFECT_ALTERNATING
     _RGBM_SINGLE_DYNAMIC( ALTERNATING )
   #endif
-  #ifdef RGBLIGHT_EFFECT_WPM_TEMP
+  #if defined(RGBLIGHT_EFFECT_WPM_TEMP) && defined(VELOCIKEY_ENABLE)
     _RGBM_SINGLE_DYNAMIC ( WPM_TEMP )
   #endif
   ////  Add a new mode here.

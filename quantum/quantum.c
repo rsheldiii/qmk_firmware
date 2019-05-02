@@ -556,7 +556,7 @@ bool process_record_quantum(keyrecord_t *record) {
     }
   #endif
   case RGB_MODE_WPM_TEMP:
-  #ifdef RGBLIGHT_EFFECT_WPM_TEMP
+  #if defined(RGBLIGHT_EFFECT_WPM_TEMP) && defined(VELOCIKEY_ENABLE)
     if (record->event.pressed) {
       rgblight_mode(RGBLIGHT_MODE_WPM_TEMP);
     }
