@@ -24,6 +24,10 @@ void velocikey_toggle(void) {
         eeprom_update_byte(EECONFIG_VELOCIKEY, 1);
 }
 
+uint8_t get_typing_speed(void) {
+  return typing_speed;
+}
+
 void velocikey_accelerate(void) {
     if (typing_speed < TYPING_SPEED_MAX_VALUE) typing_speed += (TYPING_SPEED_MAX_VALUE / 100);
 }

@@ -53,6 +53,9 @@
   #ifdef RGBLIGHT_EFFECT_ALTERNATING
     _RGBM_SINGLE_DYNAMIC( ALTERNATING )
   #endif
+  #ifdef RGBLIGHT_EFFECT_WPM_TEMP
+    _RGBM_SINGLE_DYNAMIC ( WPM_TEMP )
+  #endif
   ////  Add a new mode here.
   // #ifdef RGBLIGHT_EFFECT_<name>
   //    _RGBM_<SINGLE|MULTI>_<STATIC|DYNAMIC>( <name> )
