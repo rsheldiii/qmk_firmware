@@ -606,7 +606,7 @@ void rgblight_sethsv_eeprom_helper(uint16_t hue, uint8_t sat, uint8_t val, bool 
 #endif
 #if defined(RGBLIGHT_EFFECT_WPM_TEMP) && defined(VELOCIKEY_ENABLE)
       else if (rgblight_status.base_mode == RGBLIGHT_MODE_WPM_TEMP) {
-        // green-red, ignore the change of hue
+        // wpm temp, ignore the change of hue
         hue = rgblight_config.hue;
       }
 #endif
@@ -1208,18 +1208,13 @@ void rgblight_effect_alternating(animation_status_t *anim) {
 #endif
 
 #if defined(RGBLIGHT_EFFECT_WPM_TEMP) && defined(VELOCIKEY_ENABLE)
+__attribute__ ((weak))
+const uint16_t RGBLED_FAKE_INTERVAL PROGMEM = 120;
 void rgblight_effect_wpm_temp(animation_status_t *anim) {
-  static uint8_t typing_speed = 0;
-
-  // (slightly) smoother transitions
-  if (typing_speed > get_typing_speed()) {
-    typing_speed--;
-  } else {
-    typing_speed=get_typing_speed();
-  }
+  uint8_t typing_hue = get_interval_time(&RGBLED_FAKE_INTERVAL, 1, 120);
 
   LED_TYPE tmp_led;
-  sethsv(201 - MAX(typing_speed, 80), rgblight_config.sat, rgblight_config.val, &tmp_led);
+  sethsv(typing_hue, rgblight_config.sat, rgblight_config.val, &tmp_led);
   rgblight_setrgb(tmp_led.r, tmp_led.g, tmp_led.b);
 }
 #endif

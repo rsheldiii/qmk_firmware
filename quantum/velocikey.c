@@ -18,14 +18,10 @@ bool velocikey_enabled(void) {
 }
 
 void velocikey_toggle(void) {
-    if (velocikey_enabled()) 
+    if (velocikey_enabled())
         eeprom_update_byte(EECONFIG_VELOCIKEY, 0);
-    else 
+    else
         eeprom_update_byte(EECONFIG_VELOCIKEY, 1);
-}
-
-uint8_t get_typing_speed(void) {
-  return typing_speed;
 }
 
 void velocikey_accelerate(void) {
