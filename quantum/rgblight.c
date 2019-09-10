@@ -1209,9 +1209,10 @@ void rgblight_effect_alternating(animation_status_t *anim) {
 
 #if defined(RGBLIGHT_EFFECT_WPM_TEMP) && defined(VELOCIKEY_ENABLE)
 __attribute__ ((weak))
-const uint16_t RGBLED_FAKE_INTERVAL PROGMEM = 120;
+const uint8_t RGBLED_FAKE_INTERVAL PROGMEM = 120;
 void rgblight_effect_wpm_temp(animation_status_t *anim) {
-  uint8_t typing_hue = get_interval_time(&RGBLED_FAKE_INTERVAL, 1, 120);
+  uint8_t typing_speed = get_interval_time(&RGBLED_FAKE_INTERVAL, 0, 200);
+  uint8_t typing_hue = MAX(1, typing_speed-80);
 
   LED_TYPE tmp_led;
   sethsv(typing_hue, rgblight_config.sat, rgblight_config.val, &tmp_led);
