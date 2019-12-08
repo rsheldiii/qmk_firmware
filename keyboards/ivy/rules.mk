@@ -63,4 +63,10 @@ API_SYSEX_ENABLE = no
 # Do not enable SLEEP_LED_ENABLE. it uses the same timer as BACKLIGHT_ENABLE
 SLEEP_LED_ENABLE = no    # Breathing sleep LED during USB suspend
 
+<<<<<<< HEAD:keyboards/ivy/rules.mk
 DEFAULT_FOLDER = ivy/rev1
+=======
+LAYOUTS = ortho_5x12
+
+DEFAULT_FOLDER = preonic/rev3
+>>>>>>> 3466ac554fb261424ba2aeba3e7dce470e1f01d9:keyboards/preonic/rules.mk
