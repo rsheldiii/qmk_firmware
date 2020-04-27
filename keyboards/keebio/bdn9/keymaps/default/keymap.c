@@ -15,6 +15,16 @@
  */
 #include QMK_KEYBOARD_H
 
+
+bool is_alt_tab_active = false;    // ADD this near the begining of keymap.c
+uint16_t alt_tab_timer = 0;        // we will be using them soon.
+
+enum custom_keycodes {             // Make sure have the awesome keycode ready
+  ALT_TAB = SAFE_RANGE,
+  YES,
+  DELETE,
+};
+
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /*
         | Knob 1: Vol Dn/Up |      | Knob 2: Page Dn/Up |
@@ -23,9 +33,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         | Left              | Down | Right              |
      */
     [0] = LAYOUT(
-        KC_MUTE, KC_HOME, KC_MPLY,
-        MO(1)  , KC_UP  , RGB_MOD,
-        KC_LEFT, KC_DOWN, KC_RGHT
+        KC_MUTE, TG(1), _______,
+        ALT_TAB  , YES  , DELETE,
+        KC_UP  , KC_ENTER, KC_DOWN
     ),
     /*
         | RESET          | N/A  | Media Stop |
@@ -33,18 +43,18 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         | Media Previous | End  | Media Next |
      */
     [1] = LAYOUT(
-        RESET  , BL_STEP, KC_STOP,
-        _______, KC_HOME, RGB_MOD,
-        KC_MPRV, KC_END , KC_MNXT
+        RESET  , TG(1), _______,
+        _______, KC_STOP, RGB_MOD,
+        KC_MPRV, KC_MPLY , KC_MNXT
     ),
 };
 
 void encoder_update_user(uint8_t index, bool clockwise) {
     if (index == 0) {
         if (clockwise) {
-            tap_code(KC_VOLU);
+            tap_code(KC_WH_U);
         } else {
-            tap_code(KC_VOLD);
+            tap_code(KC_WH_D);
         }
     }
     else if (index == 1) {
@@ -54,4 +64,45 @@ void encoder_update_user(uint8_t index, bool clockwise) {
             tap_code(KC_PGUP);
         }
     }
+}
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+  switch (keycode) {               // This will do most of the grunt work with the keycodes.
+    case ALT_TAB:
+      if (record->event.pressed) {
+        if (!is_alt_tab_active) {
+          is_alt_tab_active = true;
+          register_code(KC_LALT);
+        }
+        alt_tab_timer = timer_read();
+        register_code(KC_TAB);
+      } else {
+        unregister_code(KC_TAB);
+      }
+      break;
+    case YES:
+      if (record->event.pressed) {
+          SEND_STRING("yes");
+      } else {
+        // nothin
+      }
+      break;
+    case DELETE:
+      if (record->event.pressed) {
+          SEND_STRING("del");
+      } else {
+        // nothin
+      }
+      break;
+  }
+  return true;
+}
+
+void matrix_scan_user(void) {     // The very important timer.
+  if (is_alt_tab_active) {
+    if (timer_elapsed(alt_tab_timer) > 1000) {
+      unregister_code(KC_LALT);
+      is_alt_tab_active = false;
+    }
+  }
 }
