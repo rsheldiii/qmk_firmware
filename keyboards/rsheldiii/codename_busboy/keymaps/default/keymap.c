@@ -20,7 +20,16 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
      */
     [0] = LAYOUT(
-        KC_1, KC_A, KC_B, KC_C, KC_D, KC_E, KC_F, KC_G, KC_H, NAVY_SEAL, KC_J, KC_K, KC_L, KC_M, KC_N, KC_O, KC_P, KC_Q, KC_R, KC_S, KC_T, KC_U
+        KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
+        KC_ESC, KC_1, KC_NO, KC_Q, KC_X, KC_U, KC_SPC, KC_TAB, KC_9, KC_SCLN,
+        KC_BSPC, KC_LCTL, KC_D, KC_S, KC_NO, KC_G, KC_B, KC_C, KC_V, KC_F,
+        KC_CAPS, KC_LSFT, KC_Z, KC_QUOT, KC_A, KC_8, KC_RSFT, KC_R, KC_5, KC_3,
+        KC_E, KC_NO, KC_W, KC_O, KC_T, KC_4, KC_LEFT, KC_7, KC_NO, KC_M,
+        KC_J, KC_6, KC_I, KC_K, KC_UP, KC_SLSH, KC_P, KC_RGHT, KC_NO, KC_H,
+        KC_BSLS, KC_0, KC_LALT, KC_N, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
+        KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
+        KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
+        KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO
     )
 };
 

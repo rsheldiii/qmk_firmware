@@ -58,7 +58,7 @@ void do_scan(void) {
 }
 
 void matrix_init_custom(void) {
-    
+
     print("init matrix");
     i2c_init();
     print("inited lol");
@@ -67,36 +67,89 @@ void matrix_init_custom(void) {
 
 static uint16_t scan_now = 0;
 
-bool matrix_scan_custom(matrix_row_t current_matrix[]) {
-    // dprintf("%lx\n", current_matrix[0]);
-    matrix_row_t current_row_value = 0;
+// bool matrix_scan_custom(matrix_row_t current_matrix[]) {
+//     // dprintf("%lx\n", current_matrix[0]);
+//     matrix_row_t current_row_value = 0;
 
-    bool matrix_has_changed = false;
+//     bool matrix_has_changed = false;
 
-    if (scan_now == 0) {
-        do_scan();
-    }
-    scan_now++;
+//     if (scan_now == 0) {
+//         do_scan();
+//     }
+//     scan_now++;
 
-    for (uint8_t address = 0; address < I2C_MAX_ADDRESSES; address++) {
+//     for (uint8_t address = 0; address < I2C_MAX_ADDRESSES; address++) {
+//         if (addresses[address]) {
+//             // i2c_start(address << 1, 50);
+//             uint8_t data;
+//             i2c_status_t receive_status = i2c_receive(address << 1, &data, 1, 50);
+
+//             if (receive_status == I2C_STATUS_SUCCESS && data > 0) {
+//                 current_row_value |= MATRIX_ROW_SHIFTER << address;
+//                 matrix_has_changed = true;
+//                 // print("you pressin a button, bitch?");
+//             }
+//         }
+//     }
+
+//     current_matrix[1] = current_row_value;
+
+//     // print("scan,");
+
+//     // TODO: add matrix scanning routine here
+
+//     return matrix_has_changed;
+// }
+
+
+static bool read_cols_on_row(matrix_row_t current_matrix[], uint8_t current_row) {
+    // Store last value of row prior to reading
+    matrix_row_t last_row_value = current_matrix[current_row];
+
+    // Clear data in matrix row
+    current_matrix[current_row] = 0;
+
+    uint8_t address_offset = current_row * MATRIX_COLS;
+
+    for (uint8_t column = 0; column < MATRIX_COLS; column++) {
+        uint8_t address = address_offset + column;
+
         if (addresses[address]) {
             // i2c_start(address << 1, 50);
             uint8_t data;
             i2c_status_t receive_status = i2c_receive(address << 1, &data, 1, 50);
 
             if (receive_status == I2C_STATUS_SUCCESS && data > 0) {
-                current_row_value |= MATRIX_ROW_SHIFTER << address;
-                matrix_has_changed = true;
-                // print("you pressin a button, bitch?");
+                dprintf("%d\n", address);
+                current_matrix[current_row] |= MATRIX_ROW_SHIFTER << column;
             }
         }
     }
 
-    current_matrix[1] = current_row_value;
+    // current_matrix[1] = current_row_value;
 
     // print("scan,");
 
     // TODO: add matrix scanning routine here
+
+    // return matrix_has_changed;
+
+    return (last_row_value != current_matrix[current_row]);
+}
+
+bool matrix_scan_custom(matrix_row_t current_matrix[]) {
+    // scan for new devices
+    if (scan_now == 0) {
+        do_scan();
+    }
+    scan_now++;
+
+    bool matrix_has_changed = false;
+
+    // Set row, read cols
+    for (uint8_t current_row = 0; current_row < MATRIX_ROWS; current_row++) {
+        matrix_has_changed |= read_cols_on_row(current_matrix, current_row);
+    }
 
     return matrix_has_changed;
 }
