@@ -34,19 +34,19 @@ void do_scan(void) {
 
     dprintf("Scanning...\n");
 
-    for (uint8_t address = 1; address < I2C_MAX_ADDRESSES; address++) {
+    for (uint16_t address = 1; address < I2C_MAX_ADDRESSES; address++) {
         // The i2c_scanner uses the return value of
         // i2c_start to see if a device did acknowledge to the address.
-        i2c_status_t error = i2c_start(address << 1, 50);
+        i2c_status_t error = i2c_start(address << 1, /*50*/ 250);
         if (error == I2C_STATUS_SUCCESS) {
             addresses[address] = true;
             i2c_stop();
             dprintf("  I2C device found at address 0x%02X\n", address);
             nDevices++;
         } else if (error == I2C_STATUS_ERROR) {
-            // dprintf("  Unknown error (%u) at address 0x%02X\n", error, address);
+            dprintf("  Unknown error (%u) at address 0x%02X\n", error, address);
         } else {
-            // dprintf("  Unknown error (%u) at address 0x%02X\n", error, address);
+            dprintf("  Unknown error (%u) at address 0x%02X\n", error, address);
         }
     }
 
@@ -65,7 +65,7 @@ void matrix_init_custom(void) {
     // TODO: initialize hardware here
 }
 
-static uint16_t scan_now = 0;
+static uint8_t scan_now = 0;
 
 // bool matrix_scan_custom(matrix_row_t current_matrix[]) {
 //     // dprintf("%lx\n", current_matrix[0]);
@@ -138,6 +138,7 @@ static bool read_cols_on_row(matrix_row_t current_matrix[], uint8_t current_row)
 }
 
 bool matrix_scan_custom(matrix_row_t current_matrix[]) {
+    // print("matrix scan...\n");
     // scan for new devices
     if (scan_now == 0) {
         do_scan();
