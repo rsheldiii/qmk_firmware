@@ -8,26 +8,29 @@
 #include "print.h"
 #include "i2c_master.h"
 #include "debug.h"
+#include "timer.h"
 
 #define I2C_MAX_ADDRESSES 127
+#define I2C_STARTUP_DELAY_MS 0
+#define I2C_STATUS_INTERVAL_MS 5000
 
 static bool addresses[I2C_MAX_ADDRESSES] = {false};
-// static bool keystate[I2C_MAX_ADDRESSES] = {false};
+static bool i2c_ready = false;
+static uint32_t i2c_init_time = 0;
+static bool key_state[I2C_MAX_ADDRESSES] = {false};
+static uint32_t last_status_print = 0;
 
-// TODO: remove patch
-#ifdef PROTOCOL_CHIBIOS
-#    pragma message("ChibiOS is currently 'best effort' and might not report accurate results")
-
-i2c_status_t i2c_start_bodge(uint8_t address, uint16_t timeout) {
-    i2c_start(address);
-
-    // except on ChibiOS where the only way is do do "something"
-    uint8_t data = 0;
-    return i2c_readReg(address, 0, &data, sizeof(data), timeout);
+// Prints every known i2c address and its current pressed/released state,
+// pulled from the state the scan loop already tracks. Read-only, so it
+// doesn't touch scan timing.
+void print_i2c_status(void) {
+    dprintf("-- i2c status --\n");
+    for (uint16_t address = 1; address < I2C_MAX_ADDRESSES; address++) {
+        if (addresses[address]) {
+            dprintf("  %u: %s\n", address, key_state[address] ? "DOWN" : "UP");
+        }
+    }
 }
-
-#    define i2c_start i2c_start_bodge
-#endif
 
 void do_scan(void) {
     uint8_t nDevices = 0;
@@ -36,11 +39,10 @@ void do_scan(void) {
 
     for (uint16_t address = 1; address < I2C_MAX_ADDRESSES; address++) {
         // The i2c_scanner uses the return value of
-        // i2c_start to see if a device did acknowledge to the address.
-        i2c_status_t error = i2c_start(address << 1, /*50*/ 250);
+        // i2c_ping_address to see if a device did acknowledge to the address.
+        i2c_status_t error = i2c_ping_address(address << 1, 250);
         if (error == I2C_STATUS_SUCCESS) {
             addresses[address] = true;
-            i2c_stop();
             dprintf("  I2C device found at address 0x%02X\n", address);
             nDevices++;
         } else if (error == I2C_STATUS_ERROR) {
@@ -61,6 +63,7 @@ void matrix_init_custom(void) {
 
     print("init matrix");
     i2c_init();
+    i2c_init_time = timer_read32();
     print("inited lol");
     // TODO: initialize hardware here
 }
@@ -116,11 +119,15 @@ static bool read_cols_on_row(matrix_row_t current_matrix[], uint8_t current_row)
 
         if (addresses[address]) {
             // i2c_start(address << 1, 50);
-            uint8_t data;
+            uint8_t data = 0;
             i2c_status_t receive_status = i2c_receive(address << 1, &data, 1, 50);
 
-            if (receive_status == I2C_STATUS_SUCCESS && data > 0) {
-                dprintf("%d\n", address);
+            bool pressed = (receive_status == I2C_STATUS_SUCCESS && data > 0);
+            if (pressed != key_state[address]) {
+                dprintf("  %u: %s\n", address, pressed ? "DOWN" : "UP");
+            }
+            key_state[address] = pressed;
+            if (pressed) {
                 current_matrix[current_row] |= MATRIX_ROW_SHIFTER << column;
             }
         }
@@ -138,6 +145,16 @@ static bool read_cols_on_row(matrix_row_t current_matrix[], uint8_t current_row)
 }
 
 bool matrix_scan_custom(matrix_row_t current_matrix[]) {
+    // Wait after initialization before attempting I2C communications to avoid brown start
+    if (!i2c_ready) {
+        if (timer_elapsed32(i2c_init_time) >= I2C_STARTUP_DELAY_MS) {
+            i2c_ready = true;
+            dprintf("I2C ready after %ums\n", I2C_STARTUP_DELAY_MS);
+        } else {
+            return false;
+        }
+    }
+
     // print("matrix scan...\n");
     // scan for new devices
     if (scan_now == 0) {
@@ -150,6 +167,13 @@ bool matrix_scan_custom(matrix_row_t current_matrix[]) {
     // Set row, read cols
     for (uint8_t current_row = 0; current_row < MATRIX_ROWS; current_row++) {
         matrix_has_changed |= read_cols_on_row(current_matrix, current_row);
+    }
+
+    // Periodic status pulse - does not affect scan frequency, just reports
+    // the state the scan above already gathered.
+    if (timer_elapsed32(last_status_print) >= I2C_STATUS_INTERVAL_MS) {
+        print_i2c_status();
+        last_status_print = timer_read32();
     }
 
     return matrix_has_changed;

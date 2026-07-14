@@ -1,6 +1,6 @@
 {
     "manufacturer": "rsheldiii",
-    "keyboard_name": "rsheldiii/codename_busboy",
+    "keyboard_name": "codename_busboy",
     "maintainer": "rsheldiii",
     "bootloader": "rp2040",
     "custom_matrix": "lite",
@@ -130,22 +130,6 @@
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
